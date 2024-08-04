@@ -1,23 +1,25 @@
+// Import required modules
 const express = require('express');
 const router = express.Router();
 const Question = require('../models/Questions'); // Import the Question model
 
+// Function to get today's quiz questions
 const getDailyQuiz = async (req, res) => {
     try {
+        // Set the date to midnight to ignore the time part
         const today = new Date();
-        today.setHours(0, 0, 0, 0,);
+        today.setHours(0, 0, 0, 0);
 
-        const question = await Question.find({ date: today });
-        res.json(questions);
+        // Find questions with today's date
+        const questions = await Question.find({ date: today });
+        res.json(questions); // Send the questions as a response
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: error.message }); // Send error message if there's an issue
     }
 };
 
-// Add this rout for fetching the daily quiz
+// Route for fetching the daily quiz
 router.get('/daily', getDailyQuiz);
-
-module.exports = router;
 
 // Endpoint to get all questions
 router.get('/', async (req, res) => {
@@ -45,7 +47,7 @@ router.post('/', async (req, res) => {
         option_e, 
         correct_answer, 
         difficulty 
-    }); 
+    });
 
     try {
         // Save the new question to the database

@@ -3,10 +3,7 @@ const Question = require('../models/Questions');
 
 const scheduleQuiz = async() => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/quizb', {
-            useNewParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect('mongodb://localhost:27017/quizb');
 
         const questions = await Question.find();
         const today = new Date();
