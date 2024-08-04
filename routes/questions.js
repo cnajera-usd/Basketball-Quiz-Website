@@ -4,19 +4,31 @@ const router = express.Router();
 const Question = require('../models/Questions'); // Import the Question model
 
 // Function to get today's quiz questions
+// Function to get today's quiz questions
 const getDailyQuiz = async (req, res) => {
     try {
-        // Set the date to midnight to ignore the time part
+        // Get the current date and set the time to midnight UTC
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        today.setUTCHours(0, 0, 0, 0);
 
-        // Find questions with today's date
-        const questions = await Question.find({ date: today });
+        // Calculate the next day for the range upper bound
+        const tomorrow = new Date(today);
+        tomorrow.setUTCDate(today.getUTCDate() + 1);
+
+        // Find questions that have a date within today's date (UTC)
+        const questions = await Question.find({
+            date: {
+                $gte: today,
+                $lt: tomorrow
+            }
+        });
+
         res.json(questions); // Send the questions as a response
     } catch (error) {
         res.status(500).json({ message: error.message }); // Send error message if there's an issue
     }
 };
+
 
 // Route for fetching the daily quiz
 router.get('/daily', getDailyQuiz);

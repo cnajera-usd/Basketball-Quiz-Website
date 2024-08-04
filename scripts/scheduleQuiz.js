@@ -1,25 +1,41 @@
 const mongoose = require('mongoose');
 const Question = require('../models/Questions');
+const cron = require('node-cron');
 
-const scheduleQuiz = async() => {
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch(err => {
+    console.error('MongoDB connection error:', err);
+});
+
+// Schedule the job to run every day at midnight PST
+cron.schedule('0 0 * * *', async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/quizb');
-
-        const questions = await Question.find();
         const today = new Date();
 
-        // Assign dates to questions for the next few days
-        questions.forEach(async (question, index) => {
-            // Set date to today + index
-            question.date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + index);
+        // Set today's date at midnight PST
+        const midnightPST = new Date(today.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+        midnightPST.setHours(0, 0, 0, 0);
+
+        // Get the next set of questions and set their date to today
+        const questions = await Question.find({ date: { $gt: midnightPST } }).limit(1);
+
+        if (questions.length > 0) {
+            const question = questions[0];
+            question.date = midnightPST;
             await question.save();
-        });
-
-        console.log('Question scheduled successfully!');
-        mongoose.connection.close();
+            console.log('Question scheduled for today:', question);
+        } else {
+            console.log('No questions left to schedule.');
+        }
     } catch (error) {
-        console.error('Error scheduling questions', error);
+        console.error('Error scheduling questions:', error);
     }
-};
-
-scheduleQuiz();
+}, {
+    scheduled: true,
+    timezone: "America/Los_Angeles"
+});
