@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Question = require('../models/Questions'); // Import the Question model
 
-const getDailyQuiz = aasync (req, res) => {
+const getDailyQuiz = async (req, res) => {
     try {
         const today = new Date();
         today.setHours(0, 0, 0, 0,);
