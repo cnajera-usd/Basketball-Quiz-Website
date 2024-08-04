@@ -2,6 +2,23 @@ const express = require('express');
 const router = express.Router();
 const Question = require('../models/Questions'); // Import the Question model
 
+const getDailyQuiz = aasync (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0,);
+
+        const question = await Question.find({ date: today });
+        res.json(questions);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// Add this rout for fetching the daily quiz
+router.get('/daily', getDailyQuiz);
+
+module.exports = router;
+
 // Endpoint to get all questions
 router.get('/', async (req, res) => {
     try {

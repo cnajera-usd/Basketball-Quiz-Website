@@ -8,7 +8,8 @@ const questionSchema = new mongoose.Schema({
     option_d: { type: String, required: true },
     option_e: { type: String, required: false },
     correct_answer: { type: String, required: true },
-    difficulty: { type: String, required: true }
+    difficulty: { type: String, required: true },
+    Date: { type: Date, required: true }
 
 });
 
